@@ -1,5 +1,5 @@
 # ScopeScript IDE
-App url: https://scope-script-ide.herokuapp.com
+App url: https://scopescript-ide.herokuapp.com
 ## Running client locally.
 
 Clone repository.
