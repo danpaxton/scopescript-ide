@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Arvo&family=Roboto&family=Source+Code+Pro:wght@500&display=swap');
+body {
+  background-color: black;
+  margin: 0;
+  font-family: 'Arvo', 'Source Code Pro', serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', monospace,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
