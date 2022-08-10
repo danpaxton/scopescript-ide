@@ -9,18 +9,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
 
 # Language interpreter
-from scopescript_dpaxton.interpreter import interp_program
+from scopescript.interpreter import interp_program
 
 
 # Resolution for sqlalchemy 1.4.x
-uri = os.environ.get('DATABASE_URL') if False else 'postgresql://newuser:Spank0147!?@localhost/postgres'
+uri = os.environ.get('DATABASE_URL')
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1) 
 
 api = Flask(__name__, static_folder="client/build", static_url_path="")
 api.config['SQLALCHEMY_DATABASE_URI'] = uri
 api.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-api.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY') if False else 'super_secret'
+api.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
 api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
 jwt = JWTManager(api)
 db = SQLAlchemy(api)
@@ -61,12 +61,9 @@ def login():
     data = request.get_json()   
     user = User.query.filter_by(username=data['username']).one_or_none()
     if user and user.check_password(data['password']):
-        return {
-            'username': user.username,
-            'access_token': create_access_token(identity=user)
-        }
+        return dict(username=user.username, access_token=create_access_token(identity=user))
 
-    return {'msg': 'Invalid login credentials'}, 401
+    return dict(msg='Invalid login credentials'), 401
 
 
 @api.route('/new-user', methods=['POST'])
@@ -78,9 +75,9 @@ def new_user():
     if not user:
         user = User(username=username, password=generate_password_hash(data['password']))
         db.session.add(user); db.session.commit()
-        return { 'msg': 'user created successfully.'}
+        return dict(msg='user created successfully.')
     
-    return { 'msg':'user already exists.' }, 401
+    return dict(msg='user already exists.'), 401
 
 
 
@@ -102,11 +99,7 @@ def refresh_expiring_jwts(response):
 
 
 def format_file(file):
-    return {
-        'id': file.id,
-        'title': file.title,
-        'code': file.source_code,
-    }
+    return dict(id=file.id, title=file.title, code=file.source_code)
 
 
 def binary_search(fileList, id):
@@ -132,14 +125,14 @@ def new_file():
     data = request.get_json()
     file = File(title=data['title'], source_code=data['code'], user=current_user)
     db.session.add(file); db.session.commit()
-    return { 'file': format_file(file) }
+    return dict(file=format_file(file))
 
 
 @api.route('/fetch-files', methods=['GET'])
 @cross_origin()
 @jwt_required()
 def fetch_files():
-    return { 'files': [format_file(file) for file in current_user.files] } 
+    return dict(files=[format_file(file) for file in current_user.files])
 
 
 # Get or Delete file
@@ -150,18 +143,18 @@ def fetch_file(id):
     files = current_user.files
     pos, file = binary_search(files, id)
     if request.method == 'GET':
-        return { 'file': format_file(file) }
+        return dict(file=format_file(file))
     elif request.method == 'PUT':
         file.source_code = request.json['code']
         db.session.commit()
-        return { 'msg': 'file updated.' } 
+        return dict(msg='file updated.')
     else:
         next_file = None
         if len(current_user.files) > 1:
             next_file = files[pos - 1 if pos else pos + 1].id
 
         db.session.delete(file); db.session.commit()
-        return {'next_file': next_file}
+        return dict(next_file=next_file)
 
 
 # Interp parsed code
