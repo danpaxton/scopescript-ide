@@ -13,14 +13,14 @@ from scopescript.interpreter import interp_program
 
 
 # Resolution for sqlalchemy 1.4.x
-uri = os.environ.get('DATABASE_URL')
+uri = os.environ.get('DATABASE_URL') if False else 'postgresql://newuser:Spank0147!?@localhost/postgres'
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1) 
 
 api = Flask(__name__, static_folder="client/build", static_url_path="")
 api.config['SQLALCHEMY_DATABASE_URI'] = uri
 api.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-api.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
+api.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY') if False else 'super_secret'
 api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
 jwt = JWTManager(api)
 db = SQLAlchemy(api)
