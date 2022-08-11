@@ -16,8 +16,6 @@ from scopescript.interpreter import interp_program
 # Resolution for sqlalchemy 1.4.x
 uri = os.environ.get('DATABASE_URL')
 connect(uri, sslmode='require')
-if uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1) 
 
 api = Flask(__name__, static_folder="client/build", static_url_path="")
 api.config['SQLALCHEMY_DATABASE_URI'] = uri
