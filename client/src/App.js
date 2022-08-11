@@ -29,7 +29,7 @@ const theme = createTheme({
 });
 
 export const api = axios.create({
-  baseURL: 'http://localhost:5000'
+  baseURL: 'https://scopescript-ide.herokuapp.com/'
 })
 
 export const App = () => {
