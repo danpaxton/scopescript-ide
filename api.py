@@ -7,7 +7,6 @@ from flask_jwt_extended import create_access_token, get_jwt, jwt_required, JWTMa
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
-from psycopg2 import connect
 
 # Language interpreter
 from scopescript.interpreter import interp_program
@@ -15,7 +14,8 @@ from scopescript.interpreter import interp_program
 
 # Resolution for sqlalchemy 1.4.x
 uri = os.environ.get('DATABASE_URL')
-connect(uri, sslmode='require')
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1) 
 
 api = Flask(__name__, static_folder="client/build", static_url_path="")
 api.config['SQLALCHEMY_DATABASE_URI'] = uri
