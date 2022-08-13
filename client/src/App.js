@@ -4,7 +4,7 @@ import Login from './Login';
 
 import axios from "axios";
 
-import { parseProgram } from 'scope-script-parser';
+import { parseProgram } from 'scopescript-parser';
 
 import CodeMirror from '@uiw/react-codemirror';
 import 'codemirror/keymap/sublime';
