@@ -10,7 +10,7 @@ MarkupSafe==2.1.1
 psycopg2==2.9.3
 PyJWT==2.3.0
 python-dotenv==0.20.0
-scopescript==1.0.3
+scopescript==1.0.4
 six==1.16.0
 SQLAlchemy==1.4.36
 Werkzeug==2.1.1
