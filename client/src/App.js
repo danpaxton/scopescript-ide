@@ -4,8 +4,6 @@ import Login from './Login';
 
 import axios from "axios";
 
-import { parseProgram } from 'scopescript-parser';
-
 import CodeMirror from '@uiw/react-codemirror';
 import 'codemirror/keymap/sublime';
 import 'codemirror/theme/material-darker.css';
@@ -15,7 +13,7 @@ import { Dialog, DialogActions, DialogTitle, TextField } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { List, ListItemSecondaryAction, ListItemButton, ListItemText, ListItem } from '@mui/material';
 
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const theme = createTheme({
   palette: {
@@ -29,7 +27,7 @@ const theme = createTheme({
 });
 
 export const api = axios.create({
-  baseURL: 'https://scopescript-ide.herokuapp.com/'
+  baseURL: 'scopescript-ide.vercel.app'
 })
 
 export const App = () => {
@@ -45,27 +43,26 @@ export const App = () => {
   const [openNewFile, setOpenNewFile] = useState(false);
   const [openNoSave, setOpenNoSave] = useState(false);
   const [delButtons, setDelButtons] = useState(false);
-  const [interpError, setInterpError] = useState(false);
-  const [fileName, setFileName] = useState("");
-  const [nameError, setNameError] = useState([]);
+  const [newFileName, setNewFileName] = useState("");
+  const [newNameError, setNewNameError] = useState([]);
   const [tokenExpired, setTokenExpired] = useState(false);
-  const [running, setRunning] = useState(false)
-  // Run abort controller.
-  const abortController = useRef(null);
+
+  const [interpError, setInterpError] = useState(false);
+  const [running, setRunning] = useState(false);
 
   // IDE Handles
 
   const handleClear = () => { setOutput(''); setStatus(''); setFile({...file, code: ''}); setOpenClear(false) };
 
-  const handleOpenNewFile = () => { setFileName(""); setOpenNewFile(true) }
+  const handleOpenNewFile = () => { setNewFileName(""); setOpenNewFile(true) }
 
-  const handleCloseNewFile = () => { setFileName(""); setNameError([false]); setOpenNewFile(false) };
+  const handleCloseNewFile = () => { setNewFileName(""); setNewNameError([false]); setOpenNewFile(false) };
 
   const handleUnsavedSave = () => { saveFile(); loadFile(nextId); setOpenNoSave(false) };
 
   const handleUnsavedIgnore = () => { loadFile(nextId); setOpenNoSave(false) };
 
-  const handleStop = () => abortController.current && abortController.current.abort()
+  const handleStop = () => setRunning(false);
 
   const logOut = () => {
     setFileList([]);
@@ -89,16 +86,16 @@ export const App = () => {
   }
 
   const handleNewFile = () => {
-    const err = invalidInput()
-    setNameError(err);
+    const err = invalidInput();
+    setNewNameError(err);
     if (!err[0]) {
-      newFile(fileName);
+      newFile(newFileName);
       handleCloseNewFile();
     }
   };
 
   const invalidInput = () => {
-    const f_name = fileName.trim().toLowerCase()
+    const f_name = newFileName.trim().toLowerCase()
     const name_arr = f_name.split('.');
     if (name_arr.length !== 2 || name_arr[1] !== 'sc') {
       return [true, "File name must end in '.sc'."]
@@ -109,50 +106,33 @@ export const App = () => {
     if (name_arr[0].length > 100) {
       return [true, "Max character limit exceeded."];
     }
-    if (fileList.reduce((acc, e) => acc || (e.title.toLowerCase() === f_name), false)) {
-      return [true, "Dulpicate file name."] 
+    for(const e of fileList) {
+      if (e.title.toLowerCase() === f_name) {
+        return [true, "Dulpicate file name."];
+      }
     }
     return [false];
   }
 
+  // Refreshes token if it needs to be updated (not undefined).
   const refresh = tok => {
     if (tok) {
-      setToken({...token, access_token: tok})
+      setToken({...token, access_token: tok});
     }
   }  
   
-  // User api calls
+  // Run code handle.
   const runCode = async () => {
-    setRunning(true)
-    abortController.current = new AbortController() 
-    setStatus('Starting program... ')
-    await api.post(`/interp`, parseProgram(file.code), token ? {
-      headers: {
-        'Authorization': `Bearer ${token.access_token}` 
-      }, signal: abortController.current.signal
-    }: { signal: abortController.current.signal })
-    .then(response => {
-      setRunning(false)
-      const data = response.data
-      refresh(data.access_token);
-      if (data.kind === 'error') {
-        setInterpError(true)
-        setStatus('Program error.')
-      } else {
-        setInterpError(false)
-        setStatus('Program terminated successfully.')
-      }
-      setOutput(data.output);
-    }).catch(err => {
-      setRunning(false)
-      if (err.message === 'canceled') {
-        setStatus('Program aborted.')
-      }
-    })
+    setRunning(true);
+    setStatus('Program terminated successfully.');
+    setRunning(false);
+    // incorporate new language design.
   }
 
+
+  // Checks for unauthorized error and logs out, or logs error.
   const handleUnAuth = (err) => {
-    if (err.response.status === 401) {
+    if (err.response?.status === 401) {
       logOut();
       setTokenExpired(true);
     } else {
@@ -160,6 +140,7 @@ export const App = () => {
     }
   }
 
+  // User api calls
   const newFile = async (title) => {
     try {
       const { data } = await api.post(`/new-file`, {title: title, code: ""}, {
@@ -177,20 +158,21 @@ export const App = () => {
 
   const deleteFile = async (id) => {
     try {
-      const {data} = await api.delete(`/fetch-file/${id}`,{
+      const { data } = await api.delete(`/fetch-file/${id}`,{
         headers: {
           'Authorization': `Bearer ${token.access_token}` 
         }
       })
       if (id === file.id) {
-        const nextFile = data.next_file
-        if (nextFile) {
-          loadFile(nextFile);
+        const next = data.file;
+        if (next) {
+          setFile(next);
         } else {
-          setFile({title: '', id: null, code:''})
-          setOutput('')
-          setStatus('')
+          setFile({title: '', id: null, code:''});
         }
+        setHasChange(false);
+        setOutput('');
+        setStatus('');
       }
       refresh(data.access_token);
       setDelButtons(false);
@@ -255,7 +237,7 @@ export const App = () => {
     element.click();
   };
 
-  // Fetch files if logged in.
+  // Fetch files everytime token is modified. 
   useEffect(() => {
     if (token) {
       fetchFiles();
@@ -274,8 +256,8 @@ export const App = () => {
     <div className="sidebar">
         <Dialog open={openNewFile} aria-labelledby="alert-dialog-title"> 
             <DialogActions>
-              <TextField id="standard-basic" error={nameError[0]} label={nameError[0] ? nameError[1]: "Enter file name."} 
-                variant="standard" onChange={f => setFileName(f.target.value)}/>
+              <TextField id="standard-basic" error={newNameError[0]} label={newNameError[0] ? newNameError[1]: "Enter file name."} 
+                variant="standard" onChange={f => setNewFileName(f.target.value)}/>
               <Button variant="contained" size='small' color="primary" onClick={handleNewFile}>Enter</Button>
               <Button variant="contained" size='small' color="secondary" onClick={handleCloseNewFile}>Cancel</Button>
             </DialogActions> 
@@ -291,8 +273,11 @@ export const App = () => {
           <List dense={true}>
           {fileList.map(curr_file => (
             <ListItem disablePadding key={curr_file.id} 
-              sx={{"&& .Mui-selected": { backgroundColor: "rgba(48, 79, 254, .3)" },
-                "&:hover": { backgroundColor: 'rgba(255, 255, 255, .3)'}, width: '400px'}}>
+              sx={{
+                "&& .Mui-selected": { backgroundImage: "linear-gradient(to right, rgba(48, 79, 254, .5), #101010)"},
+                "&:hover": { borderLeft: 'solid white'},
+                width: '400px'
+                }}>
             <ListItemButton selected={curr_file.id === file.id} onClick={() => handleLoadFile(curr_file.id)}> 
               <ListItemText sx={{fontFamily: "monospace"}} primary={curr_file.title}/>
             </ListItemButton>
@@ -341,7 +326,9 @@ export const App = () => {
                 mode: "jsx"
               }}
               onChange={(editor, change) => {
-                setHasChange(true);
+                if(!hasChange) {
+                  setHasChange(true);
+                }
                 setFile({...file, code: editor.getValue()});
               }}
             />

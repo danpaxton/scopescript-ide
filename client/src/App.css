@@ -11,8 +11,6 @@
   border-bottom: solid #424242;
   background: #101010;
   font-family: Courier, monospace;
-  display: inline;
-  float: left;
   padding: 10px;
   font-size: small;
   color: white;
@@ -20,12 +18,12 @@
 
 .listHeader {
   border: outset thick rgba(97, 97, 97, .3);
+  background: #212121;
 }
 
 .list {
   background-color: #101010;
   color: white;
-  height: 125vh;
   overflow: auto;
 }
 
@@ -34,7 +32,7 @@
   border: solid#212121;
   display: flex;
   flex-direction: column;
-  background: #212121;
+  background: #101010;
 }
 
 .contentButtons {

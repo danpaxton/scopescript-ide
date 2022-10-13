@@ -1,4 +1,5 @@
 import json, os
+from dotenv import load_dotenv
 from datetime import timedelta, timezone, datetime
 
 from flask import Flask, request
@@ -8,20 +9,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
 
-# Language interpreter
-from scopescript.interpreter import interp_program
-
-
-# Resolution for sqlalchemy 1.4.x
-uri = os.environ.get('DATABASE_URL')
-if uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1) 
+load_dotenv('.env')
 
 api = Flask(__name__, static_folder="client/build", static_url_path="")
-api.config['SQLALCHEMY_DATABASE_URI'] = uri
+api.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 api.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 api.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
-api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
+api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(api)
 db = SQLAlchemy(api)
 CORS(api)
@@ -149,26 +143,14 @@ def fetch_file(id):
         db.session.commit()
         return dict(msg='file updated.')
     else:
-        next_file = None
+        next = dict(file=None)
         if len(current_user.files) > 1:
-            next_file = files[pos - 1 if pos else pos + 1].id
+            next['file'] = format_file(files[pos - 1 if pos else pos + 1])
 
         db.session.delete(file); db.session.commit()
-        return dict(next_file=next_file)
+        return next
 
 
-# Interp parsed code
-@api.route('/interp', methods=['POST'])
-@cross_origin()
-@jwt_required(optional=True)
-def interp():
-    parsed = request.get_json()
-    if parsed['kind'] != 'ok':
-        return dict(kind='error', output=parsed['message'])
-    else:
-        res = interp_program(parsed['value'])
-        return dict(kind=res['kind'], output=''.join(res['output']))
-    
 
 @api.route('/')
 @cross_origin()
