@@ -27,7 +27,7 @@ const theme = createTheme({
 });
 
 export const api = axios.create({
-  baseURL: process.env.BASE_URL ?? "http://localhost:5000"
+  baseURL: process.env.BASE_URL
 })
 
 export const App = () => {
