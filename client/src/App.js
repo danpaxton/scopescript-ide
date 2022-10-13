@@ -27,7 +27,7 @@ const theme = createTheme({
 });
 
 export const api = axios.create({
-  baseURL: 'scopescript-ide.vercel.app'
+  baseURL: 'http://127.0.0.1:5000'
 })
 
 export const App = () => {
@@ -237,7 +237,7 @@ export const App = () => {
     element.click();
   };
 
-  // Fetch files everytime token is modified. 
+  // Fetch files everytime token is modified.
   useEffect(() => {
     if (token) {
       fetchFiles();

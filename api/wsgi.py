@@ -1,6 +1,6 @@
 import json, os
-from dotenv import load_dotenv
 from datetime import timedelta, timezone, datetime
+#from dotenv import load_dotenv
 
 from flask import Flask, request
 from flask.helpers import send_from_directory
@@ -9,16 +9,16 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
 
-load_dotenv('.env')
+#load_dotenv()
 
-api = Flask(__name__, static_folder="client/build", static_url_path="")
-api.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-api.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-api.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
-api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
-jwt = JWTManager(api)
-db = SQLAlchemy(api)
-CORS(api)
+app = Flask(__name__, static_folder="../client/build", static_url_path="")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+jwt = JWTManager(app)
+db = SQLAlchemy(app)
+CORS(app)
 
 
 class User(db.Model):
@@ -49,7 +49,7 @@ def user_lookup_callback(_jwt_header, jwt_data):
     return User.query.filter_by(id=identity).one_or_none()
 
 
-@api.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 @cross_origin()
 def login():
     data = request.get_json()   
@@ -60,7 +60,7 @@ def login():
     return dict(msg='Invalid login credentials'), 401
 
 
-@api.route('/new-user', methods=['POST'])
+@app.route('/new-user', methods=['POST'])
 @cross_origin()
 def new_user():
     data = request.get_json()
@@ -75,7 +75,7 @@ def new_user():
 
 
 
-@api.after_request
+@app.after_request
 def refresh_expiring_jwts(response):
     try:
         exp_timestamp = get_jwt()["exp"]
@@ -112,7 +112,7 @@ def binary_search(fileList, id):
 
 
 # Save file
-@api.route('/new-file', methods=['POST'])
+@app.route('/new-file', methods=['POST'])
 @cross_origin()
 @jwt_required()
 def new_file():
@@ -122,7 +122,7 @@ def new_file():
     return dict(file=format_file(file))
 
 
-@api.route('/fetch-files', methods=['GET'])
+@app.route('/fetch-files', methods=['GET'])
 @cross_origin()
 @jwt_required()
 def fetch_files():
@@ -130,7 +130,7 @@ def fetch_files():
 
 
 # Get or Delete file
-@api.route('/fetch-file/<id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/fetch-file/<id>', methods=['GET', 'DELETE', 'PUT'])
 @cross_origin()
 @jwt_required()
 def fetch_file(id):
@@ -151,12 +151,7 @@ def fetch_file(id):
         return next
 
 
-
-@api.route('/')
+@app.route('/')
 @cross_origin()
 def serve():
-    return send_from_directory(api.static_folder, 'index.html')
-
-
-if __name__ == '__main__':
-    api.run()
+    return send_from_directory(app.static_folder, 'index.html')
