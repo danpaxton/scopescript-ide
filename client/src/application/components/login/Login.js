@@ -1,5 +1,5 @@
-import './App.css';
-import { api } from './App';
+import "./Login.css";
+import { api } from "../../App.js";
 import { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { TextField, Icon, Button, IconButton, } from "@mui/material";
@@ -27,20 +27,21 @@ const Login = (props) => {
     }
 
     const handleLogin = async () => {
-        try {
-            const { data } = await api.post(`/login`, { username, password })
-            props.setToken(data); 
-            props.setFile({title: '', id: null, code: ''});
-            props.setOutput('');
-            props.setStatus('');
-            handleCloseLogin();
-        } catch {
-            setLoginError("Invalid username or password.");
+      try {
+        const { data } = await api.post(`/login`, { username, password })
+        props.setToken(data);
+        props.handleSetFile({title: '', id: null, code: ''});
+        handleCloseLogin();
+      } catch (err) {
+        if (err.response?.status === 401) {
+          setLoginError("Invalid username or password.");
+        } else {
+          console.log(err);
         }
+      }
     }
 
-    const handleNewUser = async (e) => {
-        e.preventDefault();
+    const handleNewUser = async () => {
         if (username.length > 50) {
             setRegisterError('Maximum username length exceeded.');
         }
@@ -52,7 +53,7 @@ const Login = (props) => {
                 handleLogin();
                 handleCloseNewUser();
             } catch(err) {
-                if (err.response.status === 401) {
+                if (err.response?.status === 401) {
                     setRegisterError('User already exists.')
                 } else {
                     console.log(err);
@@ -99,8 +100,8 @@ const Login = (props) => {
             </DialogActions> 
           </DialogContent>
         </Dialog>
-        <Button variant="text" sx={{color: 'white'}} onClick={() => props.token ? props.logOut() : setOpenLogin(true)}>{props.token ? "Logout" : "Login"}</Button>
-            { props.token ? props.token.username + " :": <Button variant='contained' sx={{color:"white"}} onClick={() => setOpenNewUser(true)}>New User</Button>}
+        <Button variant="text" sx={{color: 'whitesmoke'}} onClick={() => props.token ? props.logOut() : setOpenLogin(true)}>{props.token ? "Logout" : "Login"}</Button>
+            { props.token ? props.token.username + " :": <Button variant='contained' sx={{color:"whitesmoke"}} onClick={() => setOpenNewUser(true)}>New User</Button>}
     </div>
     );
 }

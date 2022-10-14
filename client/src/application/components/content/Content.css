@@ -1,0 +1,38 @@
+.content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  border: solid#424242;
+}
+.contentButtons {
+  align-items: baseline;
+  background-color: #212121;
+  border: outset thick #424242;
+}
+
+.codebox {
+  border-bottom: solid whitesmoke;
+  background: #212121;
+  height: 60%;
+  resize: vertical;
+  overflow: auto;
+}
+
+.footerHeader {
+  border-bottom: solid#424242;
+  color: whitesmoke;
+  font-family: Courier, monospace;
+  font-size: small;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+}
+
+.footer {
+  background: #101010;
+  flex: 1 1 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  overflow-y: auto;
+}

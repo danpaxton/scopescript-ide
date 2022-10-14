@@ -1,0 +1,9 @@
+.login {
+    grid-area: login;
+    display: flex;
+    align-items: baseline;
+    color: whitesmoke; 
+    font-size: 17px;
+    font-family: Arvo; 
+    flex-direction: row-reverse;
+  }

@@ -1,0 +1,30 @@
+.header {
+  grid-area: header;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.headerText {
+  padding: 5px;
+  font-family: Arvo;
+  color: whitesmoke;
+  font-size: x-large;
+}
+
+.wrapper {
+    height: calc(100vh - 40px);
+    width: calc(100vw - 40px);
+    padding: 20px;
+    display: grid;
+    grid-column-gap: 20px;
+    grid-template-columns: 325px minmax(400px, auto) 170px;
+    grid-template-rows: 60px minmax(300px, auto);
+    grid-template-areas:
+    "header  header  login"
+    "sidebar content content"
+  }
+
+  body {
+    background-color: black;
+  }
+  

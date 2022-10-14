@@ -1,6 +1,5 @@
 import json, os
 from datetime import timedelta, timezone, datetime
-from dotenv import load_dotenv
 
 from flask import Flask, request
 from flask.helpers import send_from_directory
@@ -8,20 +7,15 @@ from flask_jwt_extended import create_access_token, get_jwt, jwt_required, JWTMa
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
-
-# Load environment variables.
-uri = os.environ.get('DATABASE_URL', None)
-secret = os.environ.get('SECRET_KEY', None)
-if not(uri and secret):
-    load_dotenv()
-    uri = os.environ.get('DATABASE_URL')
-    secret = os.environ.get('SECRET_KEY')
+# Load environment variables, development only.
+from dotenv import load_dotenv
+load_dotenv()
 
 
 app = Flask(__name__, static_folder="client/build", static_url_path="")
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = secret
+app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
@@ -163,5 +157,3 @@ def fetch_file(id):
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
