@@ -1,13 +1,11 @@
 # Deploy
 .vercel
 
-# Client side
-client/node_modules
-client/build
-
 # Server side
 venv
 __pycache__
 .env
 .flaskenv
 
+# Mac
+.DS_Store

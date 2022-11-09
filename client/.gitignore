@@ -1,0 +1,6 @@
+# Client side
+node_modules
+build
+
+# Mac
+.DS_Store

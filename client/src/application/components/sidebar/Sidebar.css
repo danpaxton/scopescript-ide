@@ -1,9 +1,9 @@
 .changes {
-  border-top: #424242;
+  border-top: solid thin#424242;
   border-bottom: solid thin whitesmoke;
-  font-family: Courier, monospace;
+  font-family: 'Inter', sans-serif;
   padding: 10px;
-  font-size: small;
+  font-size: smaller;
   color: whitesmoke;
 }
 
@@ -22,6 +22,6 @@
 
 .sidebar {
   grid-area: sidebar;
-  border: solid#424242;
+  border: solid thin#424242;
   background-color: #101010;
 }

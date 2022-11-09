@@ -10,28 +10,47 @@ import { List, Box, ListItem } from '@mui/material';
 
 import { useState } from "react";
 
+// Import language worker.
+import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
+const instance = worker();
+
 const Content = (props) => {
   const [openClear, setOpenClear] = useState(false);
-  const [interpError, setInterpError] = useState(false);
   const [running, setRunning] = useState(false);
-
-  const handleClear = () => { props.setFile({...props.file, code: ''});  props.setHasChange(true); setOpenClear(false) };
-
-  const handleStop = () => { setRunning(false); props.setOut({...props.out, msg: "Program aborted." }) };
+  
+  // Executes after program run.
+  instance.onmessage = (e) => {
+    setRunning(false);
+    const { result } = e.data;
+    if (result) {
+      const { ok, output } = result;
+      if (output)  {
+        props.out.list.unshift({ ok, text: output });
+      }
+      props.setOut({...props.out, msg: ok ? 'Program terminated successfully.' : 'Program error.' });
+    }
+  }
 
   // Run code handle.
   const runCode = () => {
-    setInterpError(false);
     setRunning(true); 
-    props.setOut({...props.out, msg: "Running..." })
-    setTimeout(() => {
-
-    }, 1000)
-    props.out.list.unshift(`{'1':2}a;sld\nkfj\n;f`);
-    props.setOut({ list: props.out.list , msg: 'Program terminated successfully.' });
-    // incorporate new language design.
-
+    props.setOut({...props.out, msg: "Running..." });
+    instance.run(props.file.code);
   }
+
+  // Abort code handle.
+  const abortCode = () => {
+    instance.terminate();
+    props.setOut({...props.out, msg: "Program aborted." });
+    setRunning(false);
+  };
+  
+  const handleClear = () => { 
+    props.setFile({...props.file, code: ''});  
+    props.setHasChange(true); 
+    setOpenClear(false); 
+  };
+
   const downloadCode = () => {
     const element = document.createElement("a");
     const download = new Blob([props.file.code], { type: "text/plain" });
@@ -46,7 +65,7 @@ const Content = (props) => {
       <div className="contentButtons">
             <Button variant="text" color="primary" disabled={running || (props.token && !props.file.id)} onClick={runCode} > 
               <Icon>play_arrow</Icon>Run</Button>
-            <Button variant="text" color="secondary" disabled={!running} onClick={handleStop}> 
+            <Button variant="text" color="secondary" disabled={!running} onClick={abortCode}> 
               <Icon>stop</Icon>Stop</Button>
             <Button variant="text" color="primary" disabled={!props.file.id || !props.hasChange} onClick={props.saveFile}>
               <Icon>playlist_add_check</Icon>Save</Button>
@@ -79,14 +98,14 @@ const Content = (props) => {
               }}
             />
           </div>
-            <div className='footerHeader' style={{ color: interpError ? 'red' : 'whitesmoke' }}>
-              <Icon>output</Icon>: {props.out.msg}
+            <div className='footerHeader'>
+              <Icon size="large">chevron_right</Icon>{'  ' + props.out.msg}
             </div>
           <div className="footer">
             <List dense={true}>
               {props.out.list.map((e, i) => (
-                <ListItem divider sx={{ borderColor:'#212121', color: '#536dfe' }} key={i}>
-                  <Box key={i} sx={{overflow:'auto', fontFamily:'Source Code Pro'}}>{e}</Box>
+                <ListItem divider sx={{ borderColor:'#212121', color: 'whitesmoke' }} key={i}>
+                  <Box key={i} sx={{ color: e.ok ? '#8c9eff' : '#ff6e40', overflow:'auto', fontFamily:'Source Code Pro, monospace'}}>{e.text}</Box>
                 </ListItem>)
               )}
             </List>

@@ -1,5 +1,5 @@
 import './App.css';
-import useToken from '../utilities/useToken.js';
+import useToken from './useToken.js';
 
 import Sidebar from './components/sidebar/Sidebar.js';
 import Content from './components/content/Content.js';
@@ -24,7 +24,7 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'Roboto', 'Source Code Pro'
+      'Roboto', 'sans-serif'
     ].join(',')
   }
 });
@@ -38,10 +38,7 @@ export const App = () => {
   const { token, setToken, removeToken } = useToken();
   const [tokenExpired, setTokenExpired] = useState(false);
   const [hasChange, setHasChange] = useState(true);
-  const [out, setOut] = useState({
-    list: [],
-    msg: "Run program."
-   });
+  const [out, setOut] = useState({ list: [], msg: "Run program." });
   const [file, setFile ] = useState({ 
     title: token ? '' : "untitled.sc", 
     id: null, 
@@ -95,7 +92,7 @@ export const App = () => {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet"></link>
     <ThemeProvider theme={theme}>
     <div className="header"><div className="headerText">ScopeScript <Icon size='larger'>dynamic_feed</Icon></div>
-      <Button sx={{color: 'whitesmoke'}} align='right' onClick={() => window.open("https://github.com/danpaxton/scope-script-parser/blob/main/README.md")}>language information</Button>
+      <Button sx={{color: 'whitesmoke'}} align='right' onClick={() => window.open("https://github.com/danpaxton/scopescript/blob/main/README.md")}>language information</Button>
     </div>
     <Login token={token} setToken={setToken} handleSetFile={handleSetFile} logOut={logOut}/>
     <Sidebar token={token} file={file} saveFile={saveFile} hasChange={hasChange} handleSetFile={handleSetFile}

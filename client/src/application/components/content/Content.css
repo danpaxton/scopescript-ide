@@ -2,7 +2,7 @@
   grid-area: content;
   display: flex;
   flex-direction: column;
-  border: solid#424242;
+  border: solid thin#424242;
 }
 .contentButtons {
   align-items: baseline;
@@ -19,10 +19,10 @@
 }
 
 .footerHeader {
-  border-bottom: solid#424242;
+  border-bottom: solid thin#424242;
   color: whitesmoke;
-  font-family: Courier, monospace;
-  font-size: small;
+  font-family: 'Inter', sans-serif;
+  font-size: smaller;
   display: flex;
   flex-direction: row;
   align-items: center;
