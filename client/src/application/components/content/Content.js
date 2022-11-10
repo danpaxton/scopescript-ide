@@ -11,8 +11,7 @@ import { List, Box, ListItem } from '@mui/material';
 import { useState } from "react";
 
 // Import language worker.
-import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
-const instance = worker();
+import { instance } from "../../App";
 
 const Content = (props) => {
   const [openClear, setOpenClear] = useState(false);

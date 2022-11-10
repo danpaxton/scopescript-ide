@@ -13,6 +13,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useState } from 'react';
 
+// Import language worker.
+import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
+export const instance = worker();
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -97,7 +101,7 @@ export const App = () => {
     <Login token={token} setToken={setToken} handleSetFile={handleSetFile} logOut={logOut}/>
     <Sidebar token={token} file={file} saveFile={saveFile} hasChange={hasChange} handleSetFile={handleSetFile}
       refresh={refresh} handleUnAuth={handleUnAuth} fileList={fileList} setFileList={setFileList}/>
-    <Content file={file} hasChange={hasChange} out={out} setOut={setOut} saveFile={saveFile}
+    <Content token={token} file={file} hasChange={hasChange} out={out} setOut={setOut} saveFile={saveFile}
       setFile={setFile} setHasChange={setHasChange}/>
     <Dialog open={tokenExpired}>
       <DialogTitle sx={{fontSize: 17, textAlign:'center'}}>{"Access token has expired. Logging out."}</DialogTitle>
