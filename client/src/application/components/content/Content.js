@@ -13,6 +13,7 @@ import { useState } from "react";
 
 // Import language worker.
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
+let instance = worker();
 
 // Codemirror theme.
 const myTheme = createTheme({
@@ -57,10 +58,8 @@ const Content = (props) => {
   const [openClear, setOpenClear] = useState(false);
   const [running, setRunning] = useState(false);
   
-  let instance = worker();
   // Executes after program run.
   instance.onmessage = (e) => {
-    setRunning(false);
     const { result } = e.data;
     if (result) {
       const { ok, output, time } = result;
@@ -74,6 +73,7 @@ const Content = (props) => {
       }
       props.setOut({...props.out, msg: ok ? 'Program terminated successfully.' : 'Program error.' });
     }
+    setRunning(false);
   }
 
   // Run code handle.
