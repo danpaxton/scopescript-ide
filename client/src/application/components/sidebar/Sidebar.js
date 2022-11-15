@@ -64,18 +64,18 @@ const Sidebar = (props) => {
     }
     
     const newFile = async (title) => {
-    try {
-        const { data } = await api.post(`/new-file`, {title: title, code: ""}, {
-        headers: {
-            'Authorization': `Bearer ${props.token.access_token}` 
-        }
-        })
-        props.refresh(data.access_token); 
-        props.setFileList([...props.fileList, data.file]);
-        handleLoadFile(data.file.id);
-    } catch(err) {
-        props.handleUnAuth(err);
-    }
+        try {
+            const { data } = await api.post(`/new-file`, {title: title, code: ""}, {
+            headers: {
+                'Authorization': `Bearer ${props.token.access_token}` 
+            }
+            })
+            props.refresh(data.access_token); 
+            props.setFileList([...props.fileList, data.file]);
+            handleLoadFile(data.file.id);
+        } catch(err) {
+            props.handleUnAuth(err);
+        }   
     } 
 
     const invalidInput = () => {
