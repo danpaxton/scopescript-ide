@@ -21,7 +21,7 @@ The client should now be running on localhost port 3000.
 If the user is not logged in, the application will work for running an untitled program and downloading it to the user's local machine. These programs cannot be saved.
 
 ### User mode.
-The user can either create a new login or login with existing credentials. After a succesful login the new-file button should illuminate, once clicked the user is prompted with a textfield where they can enter a file name followed by '.sc'. After a file is loaded and a change has been made, the save button should now be illuminated allowing the user to save their code. The user can delete a file by clicking the delete button and then selecting the corresponding delete icon next to the file. Once the user logs out the app will return to anonymous mode.
+The user can either create a new login or login with existing credentials. After a succesful login the new-file button should illuminate, once clicked the user is prompted with a textfield where they can enter a file name followed by '.sc'. After a file is loaded and a change has been made, the save button should now be illuminated allowing the user to save their code. The user can delete a file by clicking the delete button and then selecting the corresponding delete icon next to the file. After the user logs out the app will return to anonymous mode.
 
 Codemirror Highlighter: https://github.com/danpaxton/codemirror-scopescript
 
