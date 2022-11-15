@@ -13,7 +13,6 @@ const Sidebar = (props) => {
     const [newNameError, setNewNameError] = useState([]);
     const [nextId, setNextId] = useState(null);
     const [delButtons, setDelButtons] = useState(false);
-    
     const handleOpenNewFile = () => { setNewFileName(""); setOpenNewFile(true) }
     const handleCloseNewFile = () => { setNewFileName(""); setNewNameError([false]); setOpenNewFile(false) };
 
@@ -64,20 +63,20 @@ const Sidebar = (props) => {
         }
     }
     
-      const newFile = async (title) => {
-        try {
-          const { data } = await api.post(`/new-file`, {title: title, code: ""}, {
-            headers: {
-              'Authorization': `Bearer ${props.token.access_token}` 
-            }
-          })
-          props.refresh(data.access_token); 
-          props.setFileList([...props.fileList, data.file]);
-          handleLoadFile(data.file.id);
-        } catch(err) {
-          props.handleUnAuth(err);
+    const newFile = async (title) => {
+    try {
+        const { data } = await api.post(`/new-file`, {title: title, code: ""}, {
+        headers: {
+            'Authorization': `Bearer ${props.token.access_token}` 
         }
-      } 
+        })
+        props.refresh(data.access_token); 
+        props.setFileList([...props.fileList, data.file]);
+        handleLoadFile(data.file.id);
+    } catch(err) {
+        props.handleUnAuth(err);
+    }
+    } 
 
     const invalidInput = () => {
         const f_name = newFileName.trim().toLowerCase()
@@ -108,8 +107,6 @@ const Sidebar = (props) => {
         }
     };
 
-
-
     const fetchFiles = async () => {
         try {
             const { data } = await api.get(`/fetch-files`,{
@@ -127,8 +124,9 @@ const Sidebar = (props) => {
     // Fetch files everytime token is modified.
     useEffect(() => {
         if (props.token) {
-        fetchFiles();
+            fetchFiles();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.token])
 
     return (
@@ -158,20 +156,15 @@ const Sidebar = (props) => {
         <div className='list'>
             <List dense={true}>
                 {props.fileList.map(curr_file => (
-                    <ListItem disablePadding key={curr_file.id} 
-                    sx={{
-                        "&& .Mui-selected": { backgroundImage: "linear-gradient(to right, rgba(48, 79, 254, .5), #101010)"},
-                        "&:hover": { borderLeft: 'solid whitesmoke'},
-                        width: '585px'
-                        }}>
+                <ListItem class="listItem" disablePadding key={curr_file.id}>
                     <ListItemButton selected={curr_file.id === props.file.id} onClick={() => handleLoadFile(curr_file.id)}> 
-                    <ListItemText primary={curr_file.title}/>
+                        <ListItemText primary={curr_file.title}/>
                     </ListItemButton>
                     <ListItemSecondaryAction>
                         { delButtons ? <IconButton size='small' color='secondary' onClick={() => deleteFile(curr_file.id)}>
                         <Icon>delete</Icon></IconButton> : null}
                     </ListItemSecondaryAction>
-                    </ListItem>)
+                </ListItem>)
                 )}
             </List>
         </div>

@@ -66,7 +66,7 @@ const Login = (props) => {
     return (
     <div className='login'>
       <Dialog open={openLogin}> 
-        <DialogTitle sx={{fontSize: 17}} id="alert-dialog-title">{"User login"}</DialogTitle>
+        <DialogTitle sx={{fontSize: 17}}>{"User login"}</DialogTitle>
         <DialogContent>
         <DialogContentText sx={{fontSize: 13}}>{loginError ? loginError : "Enter user credentials."}
           </DialogContentText>
@@ -84,7 +84,7 @@ const Login = (props) => {
             </DialogContent>
         </Dialog>
         <Dialog open={openNewUser}> 
-          <DialogTitle sx={{fontSize: 17}} id="alert-dialog-title">{"Create new user"}</DialogTitle>
+          <DialogTitle sx={{fontSize: 17}}>{"Create new user"}</DialogTitle>
           <DialogContent>
             <DialogContentText sx={{fontSize: 13}}>{registerError ? registerError : "Enter new user information."}
             </DialogContentText>

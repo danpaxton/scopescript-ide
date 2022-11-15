@@ -2,12 +2,12 @@
   grid-area: content;
   display: flex;
   flex-direction: column;
-  border: solid thin#424242;
+  border: solid thin #424242;
 }
 .contentButtons {
   align-items: baseline;
   background-color: #212121;
-  border: outset thick #424242;
+  border: outset #424242;
 }
 
 .codebox {
@@ -19,7 +19,7 @@
 }
 
 .footerHeader {
-  border-bottom: solid thin#424242;
+  border-bottom: solid thin #616161;
   color: whitesmoke;
   font-family: 'Inter', sans-serif;
   font-size: smaller;
@@ -35,4 +35,23 @@
   white-space: pre-wrap;
   overflow-wrap: break-word;
   overflow-y: auto;
+}
+
+.outputLine {
+  overflow:auto;
+  font-size: smaller;
+  font-family: 'Source Code Pro', monospace;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.runTime {
+  color: slategray;
+  font-size: smaller;
+  font-style: italic;
+  font-family: 'Inter';
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: flex;
+  align-items:center;
 }

@@ -13,10 +13,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useState } from 'react';
 
-// Import language worker.
-import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
-export const instance = worker();
-
 const theme = createTheme({
   palette: {
     primary: {

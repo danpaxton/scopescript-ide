@@ -1,27 +1,36 @@
 .changes {
-  border-top: solid thin#424242;
-  border-bottom: solid thin whitesmoke;
+  border-bottom: solid thin#616161;
   font-family: 'Inter', sans-serif;
   padding: 10px;
   font-size: smaller;
   color: whitesmoke;
+  background-color: #212121;
 }
 
 .listHeader {
   align-items: baseline;
   background-color: #212121;
-  border: outset thick #424242;
+  border: outset #424242;
 }
 
 .list {
   color: whitesmoke;
-  display: flex;
-  flex-direction: column;
   overflow: auto;
+}
+
+.listItem {
+  width: 100%;
+}
+.listItem:hover {
+  border-left: solid whitesmoke;
 }
 
 .sidebar {
   grid-area: sidebar;
-  border: solid thin#424242;
+  border: solid thin #424242;
   background-color: #101010;
+}
+
+.Mui-selected {
+  background-image: linear-gradient(to right, rgba(48, 79, 254, .5), #101010);
 }
