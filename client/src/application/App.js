@@ -30,7 +30,7 @@ const theme = createTheme({
 });
 
 export const api = axios.create({
-  baseURL: 'https://scopescript-ide.vercel.app/'
+  baseURL: "https://scopescript-ide.vercel.app/"
 })
 
 export const App = () => {

@@ -7,7 +7,6 @@ from flask_jwt_extended import create_access_token, get_jwt, jwt_required, JWTMa
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
-
 # Load environment variables, development only.
 from dotenv import load_dotenv
 load_dotenv()
