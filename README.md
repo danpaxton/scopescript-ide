@@ -1,5 +1,5 @@
 # ScopeScript IDE
-Production Deployment: https://scopescript-debnxn18l-danpaxton.vercel.app/
+App url: https://scopescript-cl68nkbns-danpaxton.vercel.app/
 ## Running client locally.
 
 Clone repository.
