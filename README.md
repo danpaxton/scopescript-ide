@@ -1,5 +1,5 @@
 # ScopeScript IDE
-App url: https://scopescript-jnacagze4-danpaxton.vercel.app/
+App url: https://scopescript-hjaoutq0k-danpaxton.vercel.app/
 ## Running client locally.
 
 Clone repository.
