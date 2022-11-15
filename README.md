@@ -23,6 +23,8 @@ If the user is not logged in, the application will work for running an untitled 
 ### User mode.
 The user can either create a new login or login with existing credentials. After a succesful login the new-file button should illuminate, once clicked the user is prompted with a textfield where they can enter a file name followed by '.sc'. After a file is loaded and a change has been made, the save button should now be illuminated allowing the user to save their code. The user can delete a file by clicking the delete button and then selecting the corresponding delete icon next to the file. Once the user logs out the app will return to anonymous mode.
 
+Codemirror Highlighter: https://github.com/danpaxton/codemirror-scopescript
+
 ## Frontend
 The frontend was built using React.js and makes requests to the backend using Axios. The app is styled using a grid layout, Material UI, and Google Icons/Fonts. After login, the user's name and access token are stored in local storage to prevent logout on refresh. If an access token is close to expiration upon request the access token will be refreshed after api response. Using the Codemirror React component, the app retrieves user input (code) as raw text. ScopeScript is installed in the frontend, using a web worker, user code is parsed and interpreted without blocking the execution of the application.
 
