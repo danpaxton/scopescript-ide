@@ -30,4 +30,4 @@ The frontend was built using React.js and makes requests to the backend using Ax
 
 
 ## Backend
-The backend was built using a flask rest api and connects to a postgres database using ElephantSql. User authentication was implemented using flask-jwt and automatically refreshes tokens close to expiration by checking time stamps after each request and appending the new token to the request response if the token needs to be refreshed. The api supports user login and creation along with the ability to fetch, delete, create, and update file(s). 
+The backend was built using a flask rest api and connects to a postgres database using ElephantSql. User authentication was implemented using flask-jwt and automatically refreshes tokens close to expiration by checking time stamps after each request and appending the new token to the request response if the token needs to be refreshed. The api supports user login and creation along with the ability to fetch, delete, create, and update files. 
