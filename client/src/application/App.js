@@ -37,7 +37,7 @@ export const App = () => {
   // IDE Hooks
   const { token, setToken, removeToken } = useToken();
   const [tokenExpired, setTokenExpired] = useState(false);
-  const [hasChange, setHasChange] = useState(true);
+  const [hasChange, setHasChange] = useState(false);
   const [file, setFile ] = useState({ 
     title: token ? '' : "untitled.sc", 
     id: null, 
@@ -45,8 +45,10 @@ export const App = () => {
   });
   const [fileList, setFileList] = useState([]);
 
-  // IDE Handles
-  const handleSetFile = (f) => {  setFile(f); setHasChange(false); }
+  // IDE Handles. 
+  
+  // Wait for codemirror to recognize code change before save state reset.
+  const handleSetFile = (f) => {  setFile(f); setTimeout(() => setHasChange(false)); }
 
   // Refreshes token if it needs to be updated (not undefined).
   const refresh = tok => {

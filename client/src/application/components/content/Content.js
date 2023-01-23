@@ -125,7 +125,7 @@ const Content = (props) => {
 
   // Handle for when code is changed.
   const codeChange = (value, viewUpdate) => {
-    if(!props.hasChange) {
+    if (!props.hasChange) {
       props.setHasChange(true);
     }
     props.setFile({...props.file, code: value });
