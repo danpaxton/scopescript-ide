@@ -10,47 +10,55 @@
   border: outset #424242;
 }
 
-.codebox {
+.codeBox {
   border-bottom: solid whitesmoke;
   height: 60%;
   resize: vertical;
+  font-size: larger;
+  font-family: 'Source Code Pro', monospace;
   overflow: auto;
 }
 
-.footerHeader {
-  border-bottom: solid thin #616161;
-  color: whitesmoke;
-  font-family: 'Inter', sans-serif;
-  font-size: smaller;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 10px;
-}
-
 .footer {
-  background: #101010;
+  background: #010101;
   flex: 1 1 0;
   white-space: pre-wrap;
   overflow-wrap: break-word;
-  overflow-y: auto;
+  overflow: scroll;
+  scroll-behavior: smooth;
+}
+
+.textLine {
+  font-family: 'Source Code Pro', monospace;
+  color: whitesmoke;
 }
 
 .outputLine {
-  overflow:auto;
-  font-size: smaller;
+  overflow: auto;
   font-family: 'Source Code Pro', monospace;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
-.runTime {
-  color: slategray;
-  font-size: smaller;
-  font-style: italic;
-  font-family: 'Inter';
-  padding-top: 5px;
-  padding-bottom: 5px;
+.codeLine {
   display: flex;
-  align-items:center;
+  align-items: center;
+  color: whitesmoke;
+  font-size: larger;
+  font-family: monospace;
+}
+
+.terminal {
+  display: flex;
+  align-items: center;
+  border-top: solid thin #424242;
+  background: #212121;
+  color: white;
+}
+
+.codeTerminal {
+  width: 100%;
+  font-size: larger;
+  border: inset #212121;
+  overflow: hidden;
 }

@@ -38,7 +38,6 @@ export const App = () => {
   const { token, setToken, removeToken } = useToken();
   const [tokenExpired, setTokenExpired] = useState(false);
   const [hasChange, setHasChange] = useState(true);
-  const [out, setOut] = useState({ list: [], msg: "Run program." });
   const [file, setFile ] = useState({ 
     title: token ? '' : "untitled.sc", 
     id: null, 
@@ -47,7 +46,7 @@ export const App = () => {
   const [fileList, setFileList] = useState([]);
 
   // IDE Handles
-  const handleSetFile = (f) => {  setFile(f); setOut({ list: [], msg: "Run program." }); setHasChange(false) }
+  const handleSetFile = (f) => {  setFile(f); setHasChange(false); }
 
   // Refreshes token if it needs to be updated (not undefined).
   const refresh = tok => {
@@ -97,7 +96,7 @@ export const App = () => {
     <Login token={token} setToken={setToken} handleSetFile={handleSetFile} logOut={logOut}/>
     <Sidebar token={token} file={file} saveFile={saveFile} hasChange={hasChange} handleSetFile={handleSetFile}
       refresh={refresh} handleUnAuth={handleUnAuth} fileList={fileList} setFileList={setFileList}/>
-    <Content token={token} file={file} hasChange={hasChange} out={out} setOut={setOut} saveFile={saveFile}
+    <Content token={token} file={file} hasChange={hasChange} saveFile={saveFile}
       setFile={setFile} setHasChange={setHasChange}/>
     <Dialog open={tokenExpired}>
       <DialogTitle sx={{fontSize: 17, textAlign:'center'}}>{"Access token has expired. Logging out."}</DialogTitle>

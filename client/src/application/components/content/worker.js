@@ -1,11 +1,16 @@
-import { runProgram } from "scopescript";
-export const run = code => { 
+import { runProgramVars } from "scopescript";
+
+export const run = (main, code, oldVars) => { 
     const start = Date.now();
-    const res = runProgram(code);
+    const { kind, vars, out, last } = runProgramVars(code, oldVars);
     const millis = Date.now() - start;
-    
-    return { ok: res.kind === 'ok', 
-            output: res.out.join(""), 
+    return { 
+            main,
+            last,
+            vars,
+            code,
+            ok: kind === 'ok', 
+            output: out.join(""),
             time: Number(millis / 1000).toFixed(2)
         };
 }

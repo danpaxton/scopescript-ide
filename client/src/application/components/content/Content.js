@@ -2,93 +2,108 @@ import "./Content.css"
 
 import CodeMirror from '@uiw/react-codemirror';
 import { scopescript } from 'codemirror-lang-scopescript';
-import { createTheme } from '@uiw/codemirror-themes';
-import { tags as t } from '@lezer/highlight'
+import { myTheme } from "../Theme";
 
 import { Button, Icon } from '@mui/material';
 import { Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { List, Box, ListItem } from '@mui/material';
 
+import ScrollToBottom from 'react-scroll-to-bottom';
 import { useState } from "react";
 
 // Import language worker.
 import worker from 'workerize-loader!./worker'; // eslint-disable-line import/no-webpack-loader-syntax
 let instance = worker();
 
-// Codemirror theme.
-const myTheme = createTheme({
-  theme: 'dark',
-  settings: {
-    background: '#101010',
-    foreground: '#f5f5f5',
-    caret: '#ffc107',
-    selection: 'rgba(101, 115, 195, 0.33)',
-    selectionMatch: 'rgba(101, 115, 195, 0.33)',
-    lineHighlight: '#8a91991a',
-    gutterBackground: '#101010',
-    gutterForeground: '#616161',
-  },
-  styles: [
-       { tag: t.controlKeyword, color: '#ef6c00'},
-       { tag: t.namespace, color: '#f5f5f5' },
-       { tag: t.variableName, color: '#f5f5f5' },
-       { tag: t.special(t.variableName), color: '#8c9eff' },
-       { tag: t.propertyName, color: '#ffab40' }, 
-       { tag: t.bool, color: '#8c9eff' },
-       { tag: t.string, color: '#8bc34a'},
-       { tag: t.number, color: '#8c9eff' },
-       { tag: t.null, color: '#8c9eff' },
-       { tag: t.updateOperator, color: '#ff9800' },
-       { tag: t.arithmeticOperator, color: '#ff9800' },
-       { tag: t.logicOperator, color: '#ff9800' },
-       { tag: t.bitwiseOperator, color: '#ff9800' },
-       { tag: t.compareOperator, color: '#ff9800' },
-       { tag: t.lineComment, color:'#616161' },
-       { tag: t.definitionOperator, color: '#ff9800' },
-       { tag: t.function(t.punctuation), color: '#ff9800' },
-       { tag: t.paren, color: '#f5f5f5' },
-       { tag: t.brace, color: '#f5f5f5' },
-       { tag: t.squareBracket, color: '#f5f5f5' },
-       { tag: t.derefOperator, color: '#ff9800' },
-       { tag: t.separator, color: '#f5f5f5' },
-  ],
-});
+// Tracks terminal history, current index is maintained as a hook;
+const terminal = [];
+
+// Tracks program and terminal output.
+const out = [];
 
 const Content = (props) => {
   const [openClear, setOpenClear] = useState(false);
-  const [running, setRunning] = useState(false);
-  
+  const [programRun, setProgramRun] = useState(false);
+  const [terminalRun, setTerminalRun] = useState(false);
+  const [terminalVars, setTerminalVars] = useState(new Map());
+  const [terminalCode, setTerminalCode] = useState('');
+  const [terminalId, setTerminalId] = useState(0);
+
   // Executes after program run.
   instance.onmessage = (e) => {
     const { result } = e.data;
     if (result) {
-      const { ok, output, time } = result;
-      const { list } = props.out;
-      const clock = new Date();
-      if (ok) {
-        list.unshift({ isTime: true, time, date: clock.toLocaleTimeString() });
+      const { main, ok, vars, last, code, output, time } = result;
+      if (!main) {
+        setTerminalVars(vars);
+        out.push({ kind: 'code', code });
+        if (output) {
+          out.push({ kind: 'out', ok, text: output });
+        }
+        if (ok) {
+          out.push({ kind: 'out', ok, text: last });
+        }
+      } else {
+        if (output) {
+          out.push({ kind: 'out', ok, text: output });
+        }
+        if (ok) {
+          const clock = new Date();
+          out.push({ kind: 'text', msg: 'Program terminated successfully.' })
+          out.push({ kind: 'time', time, date: clock.toLocaleTimeString() });
+        } else {
+          out.push({ kind: 'text', msg: 'Program error.' })
+        }
       }
-      if (output)  {
-        list.unshift({ isTime: false, ok, text: output });
-      }
-      props.setOut({...props.out, msg: ok ? 'Program terminated successfully.' : 'Program error.' });
+      setProgramRun(false);
+      setTerminalRun(false);
     }
-    setRunning(false);
   }
 
   // Run code handle.
   const runCode = () => {
-    setRunning(true); 
-    props.setOut({...props.out, msg: "Running..." });
-    instance.run(props.file.code);
+    setProgramRun(true);
+    out.push({ kind: 'text', msg: 'Running...' })
+    instance.run(true, props.file.code, new Map());
+  }
+  
+  // Checks if enter was pressed, and then runs the terminal code.
+  const terminalEnter = e => {
+      if (e.key === 'Enter') {
+          e.preventDefault();
+          const curr = terminalCode;
+          if (curr.length && !programRun) {
+            setTerminalCode('');
+            // Add to terminal list, and reset.
+            setTerminalId(terminal.push(curr));
+            // Run the code.
+            setTerminalRun(true);
+            instance.run(false, curr, terminalVars);
+          }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (terminalId > 0) {
+          setTerminalCode(terminal[terminalId - 1]);
+          setTerminalId(terminalId - 1);
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (terminalId <= terminal.length - 1) {
+          setTerminalCode(terminalId < terminal.length - 1 ? terminal[terminalId + 1] : '');
+          setTerminalId(terminalId + 1);
+        }
+      }
   }
 
   // Abort code handle.
   const abortCode = () => {
     instance.terminate();
     instance = worker();
-    props.setOut({...props.out, msg: "Program aborted." });
-    setRunning(false);
+    if (programRun) {
+      out.push({ kind: 'text', msg: 'Program aborted.' })
+    }
+    setProgramRun(false);
+    setTerminalRun(false);
   };
   
   // Clear code.
@@ -108,21 +123,20 @@ const Content = (props) => {
     element.click();
   };
 
-  const { hasChange, setHasChange, file, setFile } = props;
   // Handle for when code is changed.
   const codeChange = (value, viewUpdate) => {
-    if(!hasChange) {
-      setHasChange(true);
+    if(!props.hasChange) {
+      props.setHasChange(true);
     }
-    setFile({...file, code: value });
+    props.setFile({...props.file, code: value });
   };
 
   return (
     <div className="content">
       <div className="contentButtons">
-            <Button variant="text" color="primary" disabled={running || (props.token && !props.file.id)} onClick={runCode} > 
+            <Button variant="text" color="primary" disabled={programRun || terminalRun || (props.token && !props.file.id)} onClick={runCode} > 
               <Icon>play_arrow</Icon>Run</Button>
-            <Button variant="text" color="secondary" disabled={!running} onClick={abortCode}> 
+            <Button variant="text" color="secondary" disabled={!programRun && !terminalRun} onClick={abortCode}> 
               <Icon>stop</Icon>Stop</Button>
             <Button variant="text" color="primary" disabled={!props.file.id || !props.hasChange} onClick={props.saveFile}>
               <Icon>playlist_add_check</Icon>Save</Button>
@@ -138,29 +152,45 @@ const Content = (props) => {
             <Button variant="contained" size='small' color="secondary" onClick={handleClear}>Clear</Button>
           </DialogActions> 
       </Dialog>
-      <div className="codebox">
-        <CodeMirror style={{ height: '100%'}}
+        <CodeMirror className="codeBox"
             value={props.file.code}
             onChange={codeChange}
             extensions={[scopescript()]}
             theme={myTheme}
             height="100%"
             editable={(props.token && props.file.id) || !props.token }
-            indentWithTab={true}
           />
-      </div>
-      <div className='footerHeader'>
-        <Icon size="large">chevron_right</Icon>{'  ' + props.out.msg}
-      </div>
-      <div className="footer">
-        <List dense={true}>
-            {props.out.list.map((e, i) => (
-              <ListItem divider sx={{ borderColor:'#212121', color: 'whitesmoke' }} key={i}>
-                { e.isTime ? <Box className="runTime" key={i}><Icon size='small'>subdirectory_arrow_right</Icon>Runtime: {e.time} s, at {e.date}.</Box>
-                  :<Box className="outputLine" key={i} sx={{ color: e.ok ? '#8c9eff' : '#ff6e40' }}>{e.text}</Box>
-              }</ListItem>)
-            )}
-        </List>
+        <ScrollToBottom className="footer">
+          <List>
+              {out.map((e, i) => (
+                <ListItem divider sx={{ borderColor:'#212121', color: 'whitesmoke'}} key={i}>
+                  { 
+                    e.kind === 'code' ? <Box className="codeLine" key={i}><Icon style={{ color: '#616161' }}>chevron_right</Icon>{e.code}</Box> :
+                    e.kind === 'out' ? <Box className="outputLine" key={i} sx={{ color: e.ok ? '#8c9eff' : '#ff6e40' }}>{e.text}</Box> :
+                    e.kind === 'text' ? <Box className="textLine" key={i}>{e.msg}</Box> :
+                    e.kind === 'time' ? <Box className="textLine" key={i}>Runtime: {e.time} s, at {e.date}.</Box> :
+                    null
+                  }
+                </ListItem>
+                )
+              )}
+          </List>
+        </ScrollToBottom>
+      <div className='terminal'>
+          <Icon size="large">chevron_right</Icon>
+          <CodeMirror className='codeTerminal'
+            value={terminalCode}
+            onKeyDownCapture={terminalEnter}
+            onChange={(val, update) => { setTerminalCode(val); }}
+            theme={myTheme}
+            extensions={[scopescript()]}
+            basicSetup={{
+                lineNumbers: false,
+                autocompletion: false,
+                highlightActiveLineGutter: false,
+                highlightActiveLine: false
+            }}
+          />
       </div>
     </div>
     )
