@@ -20,7 +20,7 @@
     "react-scripts": "^5.0.0",
     "react-scroll-to-bottom": "^4.2.0",
     "react-split-pane": "^2.0.3",
-    "scopescript": "^1.1.9",
+    "scopescript": "^2.0.0",
     "semantic-ui-react": "^2.1.2",
     "web-vitals": "^2.1.4"
   },
