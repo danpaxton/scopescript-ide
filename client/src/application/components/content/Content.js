@@ -6,7 +6,7 @@ const Content = (props) => {
     props.program ? 
       <Program token={props.token} file={props.file} hasChange={props.hasChange} saveFile={props.saveFile}
       setFile={props.setFile} setHasChange={props.setHasChange}/> : 
-      <Message token={props.token} handleUnAuth={props.handleUnAuth} target={props.target} setTarget={props.setTarget} 
+      <Message token={props.token} handleUnAuth={props.handleUnAuth} target={props.target} setTarget={props.setTarget} loadTarget={props.loadTarget}
         fetchTargets={props.fetchTargets} fileList={props.fileList} refreshToken={props.refreshToken} fetchFiles={props.fetchFiles}/>
   )
 }

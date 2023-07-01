@@ -8,6 +8,7 @@ import ScrollToBottom from 'react-scroll-to-bottom';
 import { useState } from 'react';
 
 const Message = (props) => {
+
     const [fileExists, setFileExists] = useState(false);
     const [fileSaved, setFileSaved] = useState(false);
     const [selectFile, setSelectFile] = useState(false);
@@ -56,6 +57,11 @@ const Message = (props) => {
         setSelectFile(false);
     }
 
+    const handleRefresh = () => {
+        props.fetchFiles();
+        props.loadTarget(props.target.id);
+    }
+        
     const enterSend = e => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -93,7 +99,7 @@ const Message = (props) => {
             <Button size="small" color="secondary" onClick={() => setSelectFile(false)}>Cancel</Button>
         </Dialog>
             <Box class='topBar'>
-                <Button color="primary" onClick={() => props.fetchTargets()}><Icon>refresh</Icon>refresh</Button>
+                <Button color="primary" onClick={handleRefresh}><Icon>refresh</Icon>refresh</Button>
              </Box>
             <ScrollToBottom className="messageArea">
                 <List>

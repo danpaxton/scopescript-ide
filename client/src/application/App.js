@@ -157,7 +157,7 @@ export const App = () => {
       refreshToken={refreshToken} handleUnAuth={handleUnAuth} fileList={fileList} fetchFiles={fetchFiles} fetchTargets={fetchTargets}
       target={target} setTarget={setTarget} targetList={targetList} loadTarget={loadTarget} delButtons={delButtons} setDelButtons={setDelButtons}/>
     <Content program={program} token={token} file={file} hasChange={hasChange} saveFile={saveFile} setFile={setFile} fetchTargets={fetchTargets} 
-        fetchFiles={fetchFiles} fileList={fileList} refreshToken={refreshToken} handleUnAuth={handleUnAuth} setHasChange={setHasChange} target={target} setTarget={setTarget}/>
+        fetchFiles={fetchFiles} fileList={fileList} refreshToken={refreshToken} loadTarget={loadTarget} handleUnAuth={handleUnAuth} setHasChange={setHasChange} target={target} setTarget={setTarget}/>
     <Dialog open={tokenExpired}>
       <DialogTitle sx={{fontSize: 17, textAlign:'center'}}>{"Access token has expired. Logging out."}</DialogTitle>
       <DialogActions>

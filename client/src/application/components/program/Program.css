@@ -28,8 +28,9 @@
   
   .line {
     font-family: 'Source Code Pro', monospace;
-    overflow: auto;
+    white-space: pre-wrap;
     overflow-wrap: break-word;
+    overflow: auto;
     color: whitesmoke;
   }
   
