@@ -15,7 +15,6 @@
 
 .list {
   color: whitesmoke;
-  overflow: auto;
 }
 
 .listItem {
@@ -29,6 +28,9 @@
   grid-area: sidebar;
   border: solid thin #424242;
   background-color: #101010;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 
 .Mui-selected {

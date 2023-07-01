@@ -22,22 +22,43 @@ db = SQLAlchemy(app)
 CORS(app)
 
 
+# Database models
+
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False)
     username = db.Column(db.VARCHAR(50), nullable=False)
-    password = db.Column(db.Text, nullable=False)
-    files = db.relationship('File', backref='user', order_by='File.id', lazy=True)
+    password = db.Column(db.TEXT, nullable=False)
+    files = db.relationship('File', backref='user', order_by='File.id')
+    targets = db.relationship('Target', backref='user', order_by='Target.id')
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
 
 class File(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.INTEGER, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False)
     title = db.Column(db.VARCHAR(103), nullable=False)
     source_code = db.Column(db.TEXT, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+
+class Target(db.Model):
+    user_id = db.Column(db.INTEGER, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False)
+    name = db.Column(db.VARCHAR(50), nullable=False)
+    messages = db.relationship('Message', backref='target', order_by='Message.id')
+
+
+class Message(db.Model):
+    target_id = db.Column(db.INTEGER, db.ForeignKey('target.id'), nullable=False)
+    id = db.Column(db.INTEGER, primary_key=True, nullable=False)
+    sent = db.Column(db.BOOLEAN, nullable=False)
+    text = db.Column(db.TEXT, nullable=False)
+    code = db.Column(db.BOOLEAN, nullable=False)
+    title = db.Column(db.VARCHAR(103), nullable=False)
+
+
+# Setup
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
@@ -48,32 +69,6 @@ def user_identity_lookup(user):
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     return User.query.filter_by(id=identity).one_or_none()
-
-
-@app.route('/login', methods=['POST'])
-@cross_origin()
-def login():
-    data = request.get_json()   
-    user = User.query.filter_by(username=data['username']).one_or_none()
-    if user and user.check_password(data['password']):
-        return dict(username=user.username, access_token=create_access_token(identity=user))
-
-    return dict(msg='Invalid login credentials'), 401
-
-
-@app.route('/new-user', methods=['POST'])
-@cross_origin()
-def new_user():
-    data = request.get_json()
-    username = data['username']
-    user = User.query.filter_by(username=username.lower()).one_or_none()
-    if not user:
-        user = User(username=username, password=generate_password_hash(data['password']))
-        db.session.add(user); db.session.commit()
-        return dict(msg='user created successfully.')
-    
-    return dict(msg='user already exists.'), 401
-
 
 
 @app.after_request
@@ -93,63 +88,186 @@ def refresh_expiring_jwts(response):
         return response
 
 
+# Helper Functions
+
+def decrement(num):
+    return num - 1 if num else num + 1
+
+
 def format_file(file):
     return dict(id=file.id, title=file.title, code=file.source_code)
 
 
-def binary_search(fileList, id):
-    l, r = 0, len(fileList) - 1
+def format_target(target):
+    messages = [ dict(sent=m.sent, code=m.code, title=m.title, text=m.text) for m in target.messages ]
+    return dict(id=target.id, name=target.name, messages=messages)
+
+
+def binary_search(list, id):
+    l, r = 0, len(list) - 1
     target = int(id)
     while (l <= r):
         m = l + (r - l) // 2
-        if fileList[m].id < target:
+        if list[m].id < target:
             l = m + 1
-        elif fileList[m].id > target:
+        elif list[m].id > target:
             r = m - 1
         else:
-            return (m, fileList[m])
+            return (m, list[m])
     
-    return None
+    return (-1, None)
 
 
-# Save file
+# Routes
+
+@app.route('/login', methods=['POST'])
+@cross_origin()
+def login():
+    data = request.get_json()   
+    username = data['username'].lower()
+    user = User.query.filter_by(username=username).one_or_none()
+    if user and user.check_password(data['password']):
+        return dict(username=username, access_token=create_access_token(identity=user))
+
+    return { 'log': 'Invalid login credentials' }, 401
+
+
+@app.route('/new-user', methods=['POST'])
+@cross_origin()
+def new_user():
+    data = request.get_json()
+    name = data['username'].lower()
+    user = User.query.filter_by(username=name).one_or_none()
+    if not user:
+        user = User(username=name, password=generate_password_hash(data['password']))
+        db.session.add(user)
+        db.session.commit()
+        return { 'log': 'user created successfully.' }
+    
+    return { 'log': 'user already exists.'}, 401
+
+
 @app.route('/new-file', methods=['POST'])
 @cross_origin()
 @jwt_required()
 def new_file():
     data = request.get_json()
     file = File(title=data['title'], source_code=data['code'], user=current_user)
-    db.session.add(file); db.session.commit()
-    return dict(file=format_file(file))
+    db.session.add(file)
+    db.session.commit()
+    return { 'file': format_file(file) }
+
+
+@app.route('/new-target', methods=['POST'])
+@cross_origin()
+@jwt_required()
+def new_target():
+    name = request.json['name'].lower()
+    if not User.query.filter_by(username=name).one_or_none():
+        return { 'log': 'User does not exist.' }, 401
+
+    for t in current_user.targets:
+        if t.name == name:
+            return { 'target': format_target(t) }
+
+    new_target = Target(name=name, user=current_user)
+    db.session.add(new_target)
+    db.session.commit()
+    return { 'target': format_target(new_target) }
 
 
 @app.route('/fetch-files', methods=['GET'])
 @cross_origin()
 @jwt_required()
 def fetch_files():
-    return dict(files=[format_file(file) for file in current_user.files])
+    return { 'files': [format_file(file) for file in current_user.files] }
 
 
-# Get or Delete file
-@app.route('/fetch-file/<id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/fetch-targets', methods=['GET'])
 @cross_origin()
 @jwt_required()
-def fetch_file(id):
+def fetch_targets():
+    return { 'targets': [format_target(t) for t in current_user.targets] }
+
+
+@app.route('/operate-file/<id>', methods=['GET', 'DELETE', 'PUT'])
+@cross_origin()
+@jwt_required()
+def operate_file(id):
     files = current_user.files
     pos, file = binary_search(files, id)
+    if not file:
+        return { 'log': 'File does not exist.'}, 401
+
     if request.method == 'GET':
-        return dict(file=format_file(file))
+        return { 'file': format_file(file) }
     elif request.method == 'PUT':
+        # Receives json object on put.
         file.source_code = request.json['code']
         db.session.commit()
-        return dict(msg='file updated.')
+        return { 'log': 'file updated.' }
     else:
-        next = dict(file=None)
+        # Return next possible file on list.
+        next = { 'file': None }
         if len(current_user.files) > 1:
-            next['file'] = format_file(files[pos - 1 if pos else pos + 1])
+            next['file'] = format_file(files[decrement(pos)])
+        
+        db.session.delete(file)
+        db.session.commit()
 
-        db.session.delete(file); db.session.commit()
         return next
+
+
+@app.route('/operate-target/<id>', methods=['GET', 'DELETE', 'POST'])
+@cross_origin()
+@jwt_required()
+def operate_target(id):
+    targets = current_user.targets
+    pos, target = binary_search(targets, id)
+    if not target:
+        return { 'log': 'unknown message target.' }, 401
+
+    if request.method == 'GET':
+        return { 'target': format_target(target) }
+    elif request.method == 'DELETE':
+        # Return next possible target on list.
+        next = { 'target': None }
+        if len(targets) > 1:
+            next['target'] = format_target(targets[decrement(pos)])
+        
+        for m in target.messages:
+            db.session.delete(m)
+
+        db.session.delete(target)
+        db.session.commit()
+
+        return next
+    else:
+        data = request.get_json()
+        text, name, code, title = data['text'], data['name'].lower(), data['code'], data['title']
+        # Edit recipients messages.
+        user = User.query.filter_by(username=name).one_or_none()
+        if not user:
+            return { 'log': 'User does not exist.' }, 401
+
+        curr_ref, curr_name = None, current_user.username
+        for t in user.targets:
+            if t.name == curr_name:
+                curr_ref = t
+        
+        if not curr_ref:
+            curr_ref = Target(name=curr_name, user=user)
+            db.session.add(curr_ref)
+
+        # Sends message to target.
+        sent_message = Message(sent=True, code=code, text=text, title=title, target=target)
+        # Target receives message.
+        received_message = Message(sent=False, code=code, text=text,  title=title, target=curr_ref)
+        db.session.add(sent_message)
+        db.session.add(received_message)
+        db.session.commit()
+
+        return { 'target': format_target(target) }
 
 
 @app.route('/')

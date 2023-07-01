@@ -2,7 +2,7 @@ import "./Login.css";
 import { api } from "../../App.js";
 import { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
-import { TextField, Icon, Button, IconButton, } from "@mui/material";
+import { TextField, Icon, Button, IconButton, Box } from "@mui/material";
 
 const Login = (props) => {
     //Login Hooks
@@ -64,7 +64,7 @@ const Login = (props) => {
     const validCredentials = () => username.length && password.length
     // Login component
     return (
-    <div className='login'>
+    <Box class='login'>
       <Dialog open={openLogin}> 
         <DialogTitle sx={{fontSize: 17}}>{"User login"}</DialogTitle>
         <DialogContent>
@@ -102,7 +102,7 @@ const Login = (props) => {
         </Dialog>
         <Button variant="text" sx={{color: 'whitesmoke'}} onClick={() => props.token ? props.logOut() : setOpenLogin(true)}>{props.token ? "Logout" : "Login"}</Button>
             { props.token ? props.token.username + " :": <Button variant='contained' sx={{color:"whitesmoke"}} onClick={() => setOpenNewUser(true)}>New User</Button>}
-    </div>
+    </Box>
     );
 }
 export default Login;

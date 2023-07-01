@@ -1,0 +1,56 @@
+.program {    
+    grid-area: content;
+    display: flex;
+    flex-direction: column;
+    border: solid thin #424242;
+  }
+  .programButtons {
+    align-items: baseline;
+    background-color: #212121;
+    border: outset #424242;
+  }
+  
+  .codeBox {
+    border-bottom: solid whitesmoke;
+    height: 60%;
+    resize: vertical;
+    font-size: larger;
+    font-family: 'Source Code Pro', monospace;
+    overflow: hidden;
+  }
+  
+  .footer {
+    background: #010101;
+    flex: 1 1 0;
+    scroll-behavior: smooth;
+    overflow: hidden;
+  }
+  
+  .line {
+    font-family: 'Source Code Pro', monospace;
+    overflow: auto;
+    overflow-wrap: break-word;
+    color: whitesmoke;
+  }
+  
+  .codeLine {
+    font-family: 'Source Code Pro', monospace;
+    display: flex;
+    align-items: center;
+    color: whitesmoke;
+  }
+  
+  .terminal {
+    display: flex;
+    align-items: center;
+    border-top: solid thin #424242;
+    background: #212121;
+    color: white;
+  }
+  
+  .codeTerminal {
+    width: 100%;
+    font-size: larger;
+    border: inset #212121;
+    overflow: hidden;
+  }

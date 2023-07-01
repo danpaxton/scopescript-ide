@@ -1,0 +1,90 @@
+.messaging {    
+    grid-area: content;
+    display: flex;
+    border: solid thin #424242;
+    flex-direction: column;
+  }
+
+.topBar {
+  align-items: center;
+  background-color: #212121;
+  border: outset #424242;
+}
+
+.messageArea {
+    border-bottom: solid thin #424242;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    scroll-behavior: smooth;
+}
+
+.typeBox {
+    display: flex;
+    align-items: center;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: #212121;
+  }
+
+.typeArea {
+    padding: 5px;
+    width: 100%;
+    border: inset #212121;
+    font-family: 'Inter', sans-serif;
+    resize: none;
+    background-color: #101010;
+    color: whitesmoke;
+}
+
+.message {
+    display: flex;
+    color: whitesmoke;
+    align-items: center;
+    padding: 5px;
+}
+
+.sentM {
+    flex-direction: row-reverse;
+}
+
+.box {
+    border-radius: 2px;
+    padding: 5px;
+    max-width: 350px;
+    overflow-wrap: break-word;
+    font-size: smaller;
+    font-family: 'Inter', sans-serif;
+}
+
+.file {
+    border-radius: 2px;
+    padding: 5px;
+    font-size: smaller;
+    font-family: 'Inter', sans-serif;
+    color: whitesmoke;
+    font-weight: bolder;
+}
+
+.file:hover {
+    background: whitesmoke;
+    color:#101010
+}
+
+.sent {
+    background-color: #304ffe;
+}
+
+.recieved {
+    background-color: #424242;
+}
+
+.shareList {
+    height: 400px;
+    width: 250px;
+    overflow: auto;
+    scroll-behavior: smooth;
+}
+
