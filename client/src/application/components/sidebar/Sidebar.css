@@ -15,11 +15,16 @@
 
 .list {
   color: whitesmoke;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  height: 90%;
 }
 
 .listItem {
   width: 100%;
 }
+
 .listItem:hover {
   border-left: solid whitesmoke;
 }
@@ -28,9 +33,7 @@
   grid-area: sidebar;
   border: solid thin #424242;
   background-color: #101010;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  scroll-behavior: smooth;
+  overflow: hidden;
 }
 
 .Mui-selected {
