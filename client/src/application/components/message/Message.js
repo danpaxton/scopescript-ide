@@ -58,7 +58,7 @@ const Message = (props) => {
     }
 
     const handleRefresh = () => {
-        props.fetchFiles();
+        props.fetchTargets();
         props.loadTarget(props.target.id);
     }
         
