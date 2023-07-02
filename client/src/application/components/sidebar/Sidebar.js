@@ -220,7 +220,7 @@ const Sidebar = (props) => {
         </Box>
         { props.program ? 
             <Box class='changes'>{ props.token ? (props.file.id ? (props.hasChange ? `Unsaved changes.` :  "All changes saved.") : "Create or load file.") : "Login to create files." }</Box>
-            : null
+            : <Box class='changes'>Select user.</Box> 
         }
         <ScrollToBottom className='list'>
             <List dense={true}>
