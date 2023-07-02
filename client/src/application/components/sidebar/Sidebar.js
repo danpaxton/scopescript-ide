@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { List, ListItemSecondaryAction, ListItemButton, ListItemText, ListItem } from '@mui/material';
 import { TextField,Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { Button, Icon, IconButton, ButtonGroup, Box } from '@mui/material';
+import ScrollToBottom from "react-scroll-to-bottom";
 
 const Sidebar = (props) => {
     const [openNoSave, setOpenNoSave] = useState(false);
@@ -221,7 +222,7 @@ const Sidebar = (props) => {
             <Box class='changes'>{ props.token ? (props.file.id ? (props.hasChange ? `Unsaved changes.` :  "All changes saved.") : "Create or load file.") : "Login to create files." }</Box>
             : null
         }
-        <Box class='list'>
+        <ScrollToBottom className='list'>
             <List dense={true}>
                 {props.program ? props.fileList.map(curr_file => (
                 <ListItem class="listItem" disablePadding key={curr_file.id}>
@@ -247,7 +248,7 @@ const Sidebar = (props) => {
                 )
                 }
             </List>
-        </Box>
+        </ScrollToBottom>
     </Box>
     )
 }
