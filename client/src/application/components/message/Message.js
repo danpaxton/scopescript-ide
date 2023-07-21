@@ -43,7 +43,7 @@ const Message = (props) => {
 
     const handleDownloadFile = (title, code) => {
         for (const e of props.fileList) {
-            if (e.title.equalsIgnoreCase(title)) {
+            if (e.title.toLowerCase() === title.toLowerCase()) {
                 setFileExists(true);
                 return;
             }

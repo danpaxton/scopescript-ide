@@ -136,7 +136,7 @@ const Sidebar = (props) => {
             return [true, "Max character limit exceeded."];
         }
         for(const e of props.fileList) {
-            if (e.title.equalsIgnoreCase(fileName)) {
+            if (e.title.toLowerCase() === fileName.toLowerCase()) {
                 return [true, "Duplicate file name."];
             }
         }
