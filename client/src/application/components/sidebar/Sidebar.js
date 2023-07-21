@@ -90,7 +90,7 @@ const Sidebar = (props) => {
     
     const newFile = async (title) => {
         try {
-            const { data } = await api.post(`/new-file`, {title: title, code: ""}, {
+            const { data } = await api.post(`/new-file`, {title: title.trim(), code: ""}, {
                headers: {
                    'Authorization': `Bearer ${props.token.access_token}` 
                }
@@ -105,7 +105,7 @@ const Sidebar = (props) => {
 
     const newTarget = async (name) => {
         try {
-            const { data } = await api.post(`/new-target`, { name }, {
+            const { data } = await api.post(`/new-target`, { name: name.trim() }, {
                 headers: {
                 'Authorization': `Bearer ${props.token.access_token}` 
                 }
@@ -136,7 +136,7 @@ const Sidebar = (props) => {
             return [true, "Max character limit exceeded."];
         }
         for(const e of props.fileList) {
-            if (e.title.toLowerCase() === fileName) {
+            if (e.title.equalsIgnoreCase(fileName)) {
                 return [true, "Duplicate file name."];
             }
         }
